@@ -28,8 +28,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],  # Allow only the required methods
+    allow_headers=["*"],  # Allow all headers for simplicity, you can restrict as needed
 )
 
 @app.get("/")
