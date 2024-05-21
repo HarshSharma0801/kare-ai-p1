@@ -197,7 +197,7 @@ class IndustryAnalysis:
         )
         return chat_completion.choices[0].message.content
 
-if "__name__" == "__main__":
+if __name__ == "__main__":
     api_key = "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"
     grok_model = "mixtral-8x7b-32768"
     news_api_key="2f4a447b4c3942b2bb0504ea778ee9cc"
@@ -211,16 +211,16 @@ if "__name__" == "__main__":
     
     print(analysis.get_articles(industry_sector, industry_subsector, region))
     print("-------------------------------------------------")
-    print(analysis.find_top_competitors(industry_sector, industry_subsector, region))
-    print("-------------------------------------------------")
-    print(analysis.find_technological_trends(industry_sector, industry_subsector, region))
-    print("-------------------------------------------------")
-    print(analysis.find_industry_trends(industry_sector, industry_subsector, region))
-    print("-------------------------------------------------")
-    print(
-        analysis.find_key_takeways(
-            industry_sector, industry_subsector, company_value_proposition, region
-        )
-    )
-    print("-------------------------------------------------")
-    print(analysis.top_5_predictions(industry_sector, industry_subsector, region))
+    # print(analysis.find_top_competitors(industry_sector, industry_subsector, region))
+    # print("-------------------------------------------------")
+    # print(analysis.find_technological_trends(industry_sector, industry_subsector, region))
+    # print("-------------------------------------------------")
+    # print(analysis.find_industry_trends(industry_sector, industry_subsector, region))
+    # print("-------------------------------------------------")
+    # print(
+    #     analysis.find_key_takeways(
+    #         industry_sector, industry_subsector, company_value_proposition, region
+    #     )
+    # )
+    # print("-------------------------------------------------")
+    # print(analysis.top_5_predictions(industry_sector, industry_subsector, region))
