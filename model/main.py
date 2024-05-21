@@ -29,7 +29,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Yahoo the server is up and running !"}
+    return {"message": "Yupppp the server is up and running !"}
 
 class IndustryRequest(BaseModel):
     industry_sector: str
