@@ -17,14 +17,19 @@ analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
 
 app = FastAPI()
 
-origins = ["http://localhost:3000"]
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost:3000",
+    "http://localhost:8080",
+]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")
