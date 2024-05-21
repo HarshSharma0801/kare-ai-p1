@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Any, Dict
 import json
+from fastapi.middleware.cors import CORSMiddleware
+
 
 # Assuming the IndustryAnalysis class and its methods are properly defined in model.py
 from model import IndustryAnalysis
