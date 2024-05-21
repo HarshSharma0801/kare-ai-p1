@@ -17,14 +17,14 @@ analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
 
 app = FastAPI()
 
-origins = ["http://localhost:3000/"]
+origins = ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_headers=origins,
 )
 
 @app.get("/")
