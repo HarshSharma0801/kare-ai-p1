@@ -1,0 +1,7 @@
+beautifulsoup4==4.12.3
+duckduckgo_search==6.1.0
+fastapi==0.111.0
+groq==0.6.0
+newsapi-python
+pydantic==1.10.12
+Requests==2.32.1
