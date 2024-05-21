@@ -2,35 +2,41 @@ from groq import Groq
 import requests
 from duckduckgo_search import DDGS
 from bs4 import BeautifulSoup as bs
-import string
 from datetime import datetime, timedelta
 from newsapi import NewsApiClient
+import time
+
 
 class IndustryAnalysis:
-    def __init__(self, api_key, grok_model,news_api_key):
+    def __init__(self, api_key, grok_model, news_api_key):
         self.client = Groq(api_key=api_key)
         self.grok_model = grok_model
         self.newsapi = NewsApiClient(api_key=news_api_key)
 
-    def get_articles(self, industry_sector, industry_subsector, region, language='en', sort_by='relevancy', page=1):
+    def get_articles(
+        self,
+        industry_sector,
+        industry_subsector,
+        region,
+        language="en",
+        sort_by="relevancy",
+        page=1,
+    ):
         current_date = datetime.now()
-        formatted_current_date = current_date.strftime('%Y-%m-%d')
+        formatted_current_date = current_date.strftime("%Y-%m-%d")
         two_weeks_ago = current_date - timedelta(weeks=1)
-        formatted_two_weeks_ago = two_weeks_ago.strftime('%Y-%m-%d')
+        formatted_two_weeks_ago = two_weeks_ago.strftime("%Y-%m-%d")
         all_articles = self.newsapi.get_everything(
-            q=f'{industry_sector} {industry_subsector} {region}',
+            q=f"{industry_sector} {industry_subsector} {region}",
             from_param=formatted_two_weeks_ago,
             to=formatted_current_date,
             language=language,
             sort_by=sort_by,
-            page=page
+            page=page,
         )
         articles_list = []
-        for article in all_articles['articles']:
-            articles_list.append({
-                'title': article['title'],
-                'url': article['url']
-            })
+        for article in all_articles["articles"]:
+            articles_list.append({"title": article["title"], "url": article["url"]})
         return articles_list
 
     def find_top_competitors(self, industry_sector, industry_subsector, region):
@@ -50,14 +56,15 @@ class IndustryAnalysis:
         chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
         webpage_text = "\n".join(chunk for chunk in chunks if chunk)
 
-        ExampleJSON = [{"company": ""}, {"company": ""}, {"company": ""},...]
+        ExampleJSON = [{"company": ""}, {"company": ""}, {"company": ""}, ...]
 
         try:
             chat_completion = self.client.chat.completions.create(
-                messages=[{
-                    "role": "system",
-                    "content": 'You provide answers in JSON ${ExampleJSON}'
-                },
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You provide answers in JSON ${ExampleJSON}",
+                    },
                     {
                         "role": "user",
                         "content": f"""This is a data of top competitors below:
@@ -66,7 +73,7 @@ class IndustryAnalysis:
                         You have to return the response as a list of top 10 competitors in a list format only.
                         Do not provide any other details except the list of top 10 competitors in the sector of {industry_sector} and subsector of {industry_subsector} only in {ExampleJSON} json format, no other information or format.  do not give anything other than the json.
                         If you don't know the answer, just say that, do not make stuff up.""",
-                    }
+                    },
                 ],
                 model=self.grok_model,
             )
@@ -94,7 +101,7 @@ class IndustryAnalysis:
         )
         results = DDGS().text(query, max_results=30)
         formattedText = ""
-        ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""},...]
+        ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""}, ...]
         for result in results:
             formattedText += f'{result["title"]} - {result["body"]}\n'
 
@@ -121,7 +128,7 @@ class IndustryAnalysis:
         query = f"{industry_sector} {industry_subsector} industry trends in {region}"
         results = DDGS().text(query, max_results=30)
         formattedText = ""
-        ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""},...]
+        ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""}, ...]
         for result in results:
             formattedText += f'{result["title"]} - {result["body"]}\n'
         chat_completion = self.client.chat.completions.create(
@@ -144,7 +151,7 @@ class IndustryAnalysis:
     def find_key_takeways(
         self, industry_sector, industry_subsector, company_value_proposition, region
     ):
-        ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""},...]
+        ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""}, ...]
         chat_completion = self.client.chat.completions.create(
             messages=[
                 {
@@ -172,12 +179,14 @@ class IndustryAnalysis:
         ExampleJSON = [
             {"title": "", "href": "", "body": ""},
             {"title": "", "href": "", "body": ""},
-            {"title": "", "href": "", "body": ""},...
+            {"title": "", "href": "", "body": ""},
+            ...,
         ]
         ResponseFormatJSON = [
             {"prediction": "", "source": ""},
             {"prediction": "", "source": ""},
-            {"prediction": "", "source": ""},...
+            {"prediction": "", "source": ""},
+            ...,
         ]
         chat_completion = self.client.chat.completions.create(
             messages=[
@@ -197,30 +206,30 @@ class IndustryAnalysis:
         )
         return chat_completion.choices[0].message.content
 
+
 if __name__ == "__main__":
     api_key = "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"
     grok_model = "mixtral-8x7b-32768"
-    news_api_key="2f4a447b4c3942b2bb0504ea778ee9cc"
+    news_api_key = "2f4a447b4c3942b2bb0504ea778ee9cc"
     analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
-    
+
     industry_sector = "Technology"
     industry_subsector = "Artificial Intelligence"
     company_value_proposition = "Helping creating market research workflow"
     region = "India"
 
-    
     print(analysis.get_articles(industry_sector, industry_subsector, region))
     print("-------------------------------------------------")
-    # print(analysis.find_top_competitors(industry_sector, industry_subsector, region))
-    # print("-------------------------------------------------")
-    # print(analysis.find_technological_trends(industry_sector, industry_subsector, region))
-    # print("-------------------------------------------------")
-    # print(analysis.find_industry_trends(industry_sector, industry_subsector, region))
-    # print("-------------------------------------------------")
-    # print(
-    #     analysis.find_key_takeways(
-    #         industry_sector, industry_subsector, company_value_proposition, region
-    #     )
-    # )
-    # print("-------------------------------------------------")
-    # print(analysis.top_5_predictions(industry_sector, industry_subsector, region))
+    print(analysis.find_top_competitors(industry_sector, industry_subsector, region))
+    print("-------------------------------------------------")
+    print(analysis.find_technological_trends(industry_sector, industry_subsector, region))
+    print("-------------------------------------------------")
+    print(analysis.find_industry_trends(industry_sector, industry_subsector, region))
+    print("-------------------------------------------------")
+    print(
+        analysis.find_key_takeways(
+            industry_sector, industry_subsector, company_value_proposition, region
+        )
+    )
+    print("-------------------------------------------------")
+    print(analysis.top_5_predictions(industry_sector, industry_subsector, region))

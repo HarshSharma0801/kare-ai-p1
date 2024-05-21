@@ -9,7 +9,7 @@ from model import IndustryAnalysis
 # Instantiate the IndustryAnalysis object with the provided API key and model
 api_key = "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"
 grok_model = "mixtral-8x7b-32768"
-news_api_key="2f4a447b4c3942b2bb0504ea778ee9cc"
+news_api_key = "2f4a447b4c3942b2bb0504ea778ee9cc"
 
 analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
 
