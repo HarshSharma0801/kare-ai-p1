@@ -7,7 +7,7 @@ import json
 from model import IndustryAnalysis
 
 # Instantiate the IndustryAnalysis object with the provided API key and model
-api_key = "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"
+api_key = "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"
 grok_model = "mixtral-8x7b-32768"
 news_api_key = "2f4a447b4c3942b2bb0504ea778ee9cc"
 
