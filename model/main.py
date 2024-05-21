@@ -15,6 +15,10 @@ analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware, allow_origins=origins, allow_methods=["*"], allow_headers=["*"]
+)
+
 @app.get("/")
 def read_root():
     return {"message": "Yahoo the server is up and running !"}
