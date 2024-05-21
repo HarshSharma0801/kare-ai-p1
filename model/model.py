@@ -206,6 +206,15 @@ class IndustryAnalysis:
         )
         return chat_completion.choices[0].message.content
 
+    def market_size_prediciton(self, industry_sector):
+        renewable_graph = '<a href="https://www.statista.com/statistics/1094309/renewable-energy-market-size-global/" rel="nofollow"><img src="https://www.statista.com/graphic/1/1094309/renewable-energy-market-size-global.jpg" alt="Statistic: Renewable energy market size worldwide in 2021, with a forecast for 2022 to 2030 (in billion U.S. dollars) | Statista" style="width: 100%; height: auto !important; max-width:1000px;-ms-interpolation-mode: bicubic;"/></a><br />Find more statistics at  <a href="https://www.statista.com" rel="nofollow">Statista</a>'
+
+        ai_graph = '<a href="https://www.statista.com/statistics/1256246/worldwide-explainable-ai-market-revenues/" rel="nofollow"><img src="https://www.statista.com/graphic/1/1256246/worldwide-explainable-ai-market-revenues.jpg" alt="Statistic: Size of explainable artificial intelligence (AI) market worldwide from 2022 to 2030 (in billion U.S. dollars) | Statista" style="width: 100%; height: auto !important; max-width:1000px;-ms-interpolation-mode: bicubic;"/></a><br />Find more statistics at  <a href="https://www.statista.com" rel="nofollow">Statista</a>'
+        if industry_sector == "Renewable Energy":
+            return renewable_graph
+        elif industry_sector == "Artificial Intelligence":
+            return ai_graph
+
 
 if __name__ == "__main__":
     api_key = "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"
