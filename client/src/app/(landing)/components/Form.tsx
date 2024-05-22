@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FaLink } from "react-icons/fa6";
+import { RotatingLines } from "react-loader-spinner";
+import React from "react";
+import BarChart from "../components/BarChart";
 
 const MainForm = () => {
   const [selectedIndustry, setSelectedIndustry] = useState<number | null>(null);
@@ -28,6 +31,7 @@ const MainForm = () => {
     top5Predictions: { visible: false, loading: false },
     industryNews: { visible: false, loading: false },
     keyTakeaways: { visible: false, loading: false },
+    marketSize: { visible: false, loading: false },
   });
 
   const industries = [
@@ -132,6 +136,7 @@ const MainForm = () => {
   const [top5Predictions, setTop5Predictions] = useState<any[]>([]);
   const [industryNews, setIndustryNews] = useState<any[]>([]);
   const [keyTakeaways, setKeyTakeaways] = useState<any[]>([]);
+  const [marketSize, setMarketSize] = useState<any[]>([]);
 
   const fetchData = async (
     endpoint: string,
@@ -204,6 +209,8 @@ const MainForm = () => {
       "top5Predictions"
     );
     scrollToBottom();
+    await fetchData("market_size", data, setMarketSize, "marketSize");
+    scrollToBottom();
     await fetchData("industry_news", data, setIndustryNews, "industryNews");
     scrollToBottom();
     await fetchData("key_takeaways", data, setKeyTakeaways, "keyTakeaways");
@@ -213,7 +220,7 @@ const MainForm = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col py-20 justify-center">
+    <div className="w-full h-full flex flex-col md:py-40 md:px-40 py-20 px-20 justify-center">
       <div className="flex justify-center items-center flex-col gap-10">
         <div>Please Provide details below to generate Report</div>
 
@@ -329,10 +336,10 @@ const MainForm = () => {
                   case "top5Predictions":
                     return top5Predictions.map((data, index) => (
                       <li key={index} className="mb-2 list-disc pl-5">
-                        <div className="text-md text-gray-800">
+                        <span className="text-md text-gray-800">
                           {data.prediction}
-                        </div>
-                        <div className="flex items-center gap-[10px] text-blue-700">
+                        </span>
+                        <span className="flex items-center gap-[10px] text-blue-700">
                           <FaLink />
                           <a
                             className="underline"
@@ -342,9 +349,11 @@ const MainForm = () => {
                           >
                             Source
                           </a>
-                        </div>
+                        </span>
                       </li>
                     ));
+                  case "marketSize":
+                    return <BarChart data={marketSize} />;
                   case "industryNews":
                     return (
                       <ul className="list-disc pl-5">
@@ -383,6 +392,18 @@ const MainForm = () => {
           </div>
         </motion.div>
       ))}
+      {loading && (
+        <div className="w-full mt-10 flex justify-center">
+          <RotatingLines
+            visible={true}
+            width="50"
+            strokeColor="#6F42C1"
+            strokeWidth="5"
+            animationDuration="0.75"
+            ariaLabel="rotating-lines-loading"
+          />
+        </div>
+      )}
     </div>
   );
 };

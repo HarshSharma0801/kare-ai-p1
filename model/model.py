@@ -8,8 +8,9 @@ import time
 
 
 class IndustryAnalysis:
-    def __init__(self, api_key, grok_model, news_api_key):
-        self.client = Groq(api_key=api_key)
+    def __init__(self, api_key_1, api_key_2 , grok_model, news_api_key):
+        self.client1 = Groq(api_key=api_key_1)
+        self.client2 = Groq(api_key=api_key_2)
         self.grok_model = grok_model
         self.newsapi = NewsApiClient(api_key=news_api_key)
 
@@ -59,7 +60,7 @@ class IndustryAnalysis:
         ExampleJSON = [{"company": ""}, {"company": ""}, {"company": ""}, ...]
 
         try:
-            chat_completion = self.client.chat.completions.create(
+            chat_completion = self.client1.chat.completions.create(
                 messages=[
                     {
                         "role": "system",
@@ -80,7 +81,7 @@ class IndustryAnalysis:
         except requests.exceptions.HTTPError as e:
             time.sleep(1)  # Wait for one second before retrying
             print("trying again")
-            chat_completion = self.client.chat.completions.create(
+            chat_completion = self.client1.chat.completions.create(
                 messages=[
                     {
                         "role": "user",
@@ -105,7 +106,7 @@ class IndustryAnalysis:
         for result in results:
             formattedText += f'{result["title"]} - {result["body"]}\n'
 
-        chat_completion = self.client.chat.completions.create(
+        chat_completion = self.client1.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -131,7 +132,7 @@ class IndustryAnalysis:
         ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""}, ...]
         for result in results:
             formattedText += f'{result["title"]} - {result["body"]}\n'
-        chat_completion = self.client.chat.completions.create(
+        chat_completion = self.client1.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -152,7 +153,7 @@ class IndustryAnalysis:
         self, industry_sector, industry_subsector, company_value_proposition, region
     ):
         ExampleJSON = [{"point": ""}, {"point": ""}, {"point": ""}, ...]
-        chat_completion = self.client.chat.completions.create(
+        chat_completion = self.client1.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -188,7 +189,7 @@ class IndustryAnalysis:
             {"prediction": "", "source": ""},
             ...,
         ]
-        chat_completion = self.client.chat.completions.create(
+        chat_completion = self.client2.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -206,15 +207,39 @@ class IndustryAnalysis:
         )
         return chat_completion.choices[0].message.content
 
-    def market_size_prediciton(self, industry_sector):
-        renewable_graph = '<a href="https://www.statista.com/statistics/1094309/renewable-energy-market-size-global/" rel="nofollow"><img src="https://www.statista.com/graphic/1/1094309/renewable-energy-market-size-global.jpg" alt="Statistic: Renewable energy market size worldwide in 2021, with a forecast for 2022 to 2030 (in billion U.S. dollars) | Statista" style="width: 100%; height: auto !important; max-width:1000px;-ms-interpolation-mode: bicubic;"/></a><br />Find more statistics at  <a href="https://www.statista.com" rel="nofollow">Statista</a>'
+    # def market_size_prediciton(self, industry_sector):
+    #     renewable_graph = '<a href="https://www.statista.com/statistics/1094309/renewable-energy-market-size-global/" rel="nofollow"><img src="https://www.statista.com/graphic/1/1094309/renewable-energy-market-size-global.jpg" alt="Statistic: Renewable energy market size worldwide in 2021, with a forecast for 2022 to 2030 (in billion U.S. dollars) | Statista" style="width: 100%; height: auto !important; max-width:1000px;-ms-interpolation-mode: bicubic;"/></a><br />Find more statistics at  <a href="https://www.statista.com" rel="nofollow">Statista</a>'
 
-        ai_graph = '<a href="https://www.statista.com/statistics/1256246/worldwide-explainable-ai-market-revenues/" rel="nofollow"><img src="https://www.statista.com/graphic/1/1256246/worldwide-explainable-ai-market-revenues.jpg" alt="Statistic: Size of explainable artificial intelligence (AI) market worldwide from 2022 to 2030 (in billion U.S. dollars) | Statista" style="width: 100%; height: auto !important; max-width:1000px;-ms-interpolation-mode: bicubic;"/></a><br />Find more statistics at  <a href="https://www.statista.com" rel="nofollow">Statista</a>'
-        if industry_sector == "Renewable Energy":
-            return renewable_graph
-        elif industry_sector == "Artificial Intelligence":
-            return ai_graph
+    #     ai_graph = '<a href="https://www.statista.com/statistics/1256246/worldwide-explainable-ai-market-revenues/" rel="nofollow"><img src="https://www.statista.com/graphic/1/1256246/worldwide-explainable-ai-market-revenues.jpg" alt="Statistic: Size of explainable artificial intelligence (AI) market worldwide from 2022 to 2030 (in billion U.S. dollars) | Statista" style="width: 100%; height: auto !important; max-width:1000px;-ms-interpolation-mode: bicubic;"/></a><br />Find more statistics at  <a href="https://www.statista.com" rel="nofollow">Statista</a>'
+    #     if industry_sector == "Renewable Energy":
+    #         return renewable_graph
+    #     elif industry_sector == "Artificial Intelligence":
+    #         return ai_graph
 
+    def market_size(self, industry_sector, industry_subsector, company_value_proposition):
+        query = f"{industry_sector} {industry_subsector} market size data yearly"
+        results = DDGS().text(query, max_results=30)
+        # print(results)
+        formattedText = ""
+        for result in results:
+            formattedText += f'${result["title"]} - ${result["body"]}\n'
+        ExampleJSON = [{'title': "", 'body': ""}, {'title': "", 'body': ""}, {'title': "", 'body': ""}]
+        year = "2030"
+        ResponseFormatJSON = [
+                {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
+                {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
+                ...
+            ]
+        chat_completion = self.client2.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": f'Provide the market size data for the industry sector ${industry_sector} and subsector ${industry_subsector} in JSON format. The JSON should contain fields for title, href, and body. An example of the JSON structure is as follows: ${ExampleJSON}./nOutput a list of market sizes for all years up to ${year} for the specified sector and subsector. The response format should strictly adhere to the following JSON format: ${ResponseFormatJSON}\nEnsure the market size unit is consistently stated in billion USD for each response. Try to state market sizes from the year 2012. Only provide market size data as stated. Donot provide any unnecessary data. Give future predictions for the market size if possible. If you donot know the answer, just say that, do not make stuff up.'
+            }
+        ],
+        model= self.grok_model,
+        )
+        return chat_completion.choices[0].message.content
 
 if __name__ == "__main__":
     api_key = "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"

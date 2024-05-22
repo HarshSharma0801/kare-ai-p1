@@ -3,17 +3,19 @@ from pydantic import BaseModel
 from typing import Any, Dict
 import json
 from fastapi.middleware.cors import CORSMiddleware
-
+import datetime
 
 # Assuming the IndustryAnalysis class and its methods are properly defined in model.py
 from model import IndustryAnalysis
 
 # Instantiate the IndustryAnalysis object with the provided API key and model
-api_key = "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"
+api_key_1 = "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"
+api_key_2 = "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"
+# api_key = "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"
 grok_model = "mixtral-8x7b-32768"
 news_api_key = "2f4a447b4c3942b2bb0504ea778ee9cc"
 
-analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
+analysis = IndustryAnalysis(api_key_1, api_key_2 , grok_model , news_api_key)
 
 app = FastAPI()
 
@@ -88,6 +90,18 @@ def key_takeaways(request: KeyTakeawaysRequest):
     )
     result = json.loads(result)
     return {"key_takeaways": result}
+
+@app.post("/market_size/")
+def market_size(request: IndustryRequest):
+    result = analysis.market_size(
+        request.industry_sector,
+        request.industry_subsector,
+        request.region
+    )
+    result = result.replace("'", '"')
+    result = json.loads(result)
+    # print(result)
+    return {"market_size": result}
 
 @app.post("/top_5_predictions/")
 def top_5_predictions(request: IndustryRequest):
