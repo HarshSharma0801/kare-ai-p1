@@ -3,16 +3,14 @@ import requests
 from duckduckgo_search import DDGS
 from bs4 import BeautifulSoup as bs
 from datetime import datetime, timedelta
-from newsapi import NewsApiClient
 import time
 
 
 class IndustryAnalysis:
-    def __init__(self, api_key_1, api_key_2 , grok_model, news_api_key):
+    def __init__(self, api_key_1, api_key_2 , grok_model):
         self.client1 = Groq(api_key=api_key_1)
         self.client2 = Groq(api_key=api_key_2)
         self.grok_model = grok_model
-        self.newsapi = NewsApiClient(api_key=news_api_key)
 
     def get_articles(
         self,
@@ -264,8 +262,7 @@ if __name__ == "__main__":
     api_key_1 = "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"
     api_key_2 = "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"
     grok_model = "mixtral-8x7b-32768"
-    news_api_key = "2f4a447b4c3942b2bb0504ea778ee9cc"
-    analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
+    analysis = IndustryAnalysis(api_key_1, api_key_2 , grok_model)
 
     industry_sector = "Healthcare"
     industry_subsector = "Digital Health"
