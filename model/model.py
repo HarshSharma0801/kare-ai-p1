@@ -40,9 +40,9 @@ class IndustryAnalysis:
         articles_list = []
         for article in all_articles:
             articles_list.append({"title": article["title"], "url": article["url"], "body": article["body"], "image": article["image"]})
-        for article in articles_list:
-            print(article)
-            print("\n")
+        # for article in articles_list:
+        #     print(article)
+        #     print("\n")
         return articles_list
 
     def find_top_competitors(self, industry_sector, industry_subsector, region):
@@ -264,7 +264,7 @@ if __name__ == "__main__":
     company_value_proposition = "Helping patients with special cases to doctors in india and worldwide"
     region = "worldwide"
 
-    analysis.get_articles(industry_sector, industry_subsector, region)
+    print(analysis.get_articles(industry_sector, industry_subsector, region))
     # print("-------------------------------------------------")
     # print(analysis.find_top_competitors(industry_sector, industry_subsector, region))
     # print("-------------------------------------------------")
