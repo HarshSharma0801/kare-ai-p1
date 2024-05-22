@@ -93,9 +93,9 @@ const MainForm = () => {
     const startPosition = window.pageYOffset;
     const distance = targetPosition - startPosition;
     const duration = 500; // Duration of the animation in milliseconds
-    let start = null;
+    let start: any = null;
 
-    const step = (timestamp) => {
+    const step = (timestamp: any) => {
       if (!start) start = timestamp;
       const progress = timestamp - start;
       const currentPosition = startPosition + (distance * progress) / duration;
@@ -147,7 +147,7 @@ const MainForm = () => {
     try {
       setSections((prev) => ({
         ...prev,
-        [section]: { ...prev[section], loading: true },
+        [section]: { ...prev[section as keyof typeof prev], loading: true },
       }));
       const response = await axios.post(
         `http://127.0.0.1:8000/${endpoint}`,
@@ -167,7 +167,7 @@ const MainForm = () => {
       console.error(`Error fetching ${endpoint}:`, error);
       setSections((prev) => ({
         ...prev,
-        [section]: { ...prev[section], loading: false },
+        [section]: { ...prev[section as keyof typeof prev], loading: false },
       }));
     }
   };
@@ -294,7 +294,9 @@ const MainForm = () => {
           key={idx}
           initial={false}
           animate={{
-            height: sections[sectionKey].visible ? "auto" : 0,
+            height: sections[sectionKey as keyof typeof sections].visible
+              ? "auto"
+              : 0,
             overflow: "hidden",
           }}
         >
@@ -305,8 +307,10 @@ const MainForm = () => {
                 .toLocaleUpperCase()
                 .trim()}
             </h1>
-            {sections[sectionKey].loading && <div>Loading...</div>}
-            {!sections[sectionKey].loading &&
+            {sections[sectionKey as keyof typeof sections].loading && (
+              <div>Loading...</div>
+            )}
+            {!sections[sectionKey as keyof typeof sections].loading &&
               (() => {
                 switch (sectionKey) {
                   case "industryTrends":
