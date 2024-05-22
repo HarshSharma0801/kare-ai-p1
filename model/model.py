@@ -19,27 +19,21 @@ class IndustryAnalysis:
         industry_sector,
         industry_subsector,
         region,
-        language="en",
-        sort_by="relevancy",
-        page=1,
     ):
-        # current_date = datetime.now()
-        # formatted_current_date = current_date.strftime("%Y-%m-%d")
-        # two_weeks_ago = current_date - timedelta(weeks=1)
-        # formatted_two_weeks_ago = two_weeks_ago.strftime("%Y-%m-%d")
-        # all_articles = self.newsapi.get_top_headlines(
-        #     q=f"{industry_sector} {industry_subsector} {region}",
-        #     from_param=formatted_two_weeks_ago,
-        #     to=formatted_current_date,
-        #     language=language,
-        #     sort_by=sort_by,
-        #     page=page,
-        # )
 
-        all_articles = DDGS().news(f"{industry_sector} {industry_subsector} {region} news", max_results=10)
+        all_articles = DDGS().news(
+            f"{industry_sector} {industry_subsector} {region} news", max_results=5
+        )
         articles_list = []
         for article in all_articles:
-            articles_list.append({"title": article["title"], "url": article["url"], "body": article["body"], "image": article["image"]})
+            articles_list.append(
+                {
+                    "title": article["title"],
+                    "url": article["url"],
+                    "body": article["body"],
+                    "image": article["image"],
+                }
+            )
         # for article in articles_list:
         #     print(article)
         #     print("\n")
@@ -115,7 +109,7 @@ class IndustryAnalysis:
             messages=[
                 {
                     "role": "system",
-                    "content": "You provide answers in JSON ${ExampleJSON}",
+                    "content": "You provide answers in JSON {ExampleJSON}",
                 },
                 {
                     "role": "user",
@@ -141,7 +135,7 @@ class IndustryAnalysis:
             messages=[
                 {
                     "role": "system",
-                    "content": "You provide answers in JSON ${ExampleJSON}",
+                    "content": "You provide answers in JSON {ExampleJSON}",
                 },
                 {
                     "role": "user",
@@ -162,7 +156,7 @@ class IndustryAnalysis:
             messages=[
                 {
                     "role": "system",
-                    "content": "You provide answers in JSON ${ExampleJSON}",
+                    "content": "You provide answers in JSON {ExampleJSON}",
                 },
                 {
                     "role": "user",
@@ -261,7 +255,9 @@ if __name__ == "__main__":
 
     industry_sector = "Healthcare"
     industry_subsector = "Digital Health"
-    company_value_proposition = "Helping patients with special cases to doctors in india and worldwide"
+    company_value_proposition = (
+        "Helping patients with special cases to doctors in india and worldwide"
+    )
     region = "worldwide"
 
     print(analysis.get_articles(industry_sector, industry_subsector, region))
