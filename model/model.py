@@ -8,9 +8,9 @@ import time
 
 
 class IndustryAnalysis:
-    def __init__(self, api_key_1, api_key_2 , grok_model, news_api_key):
+    def __init__(self, api_key_1, grok_model, news_api_key):
         self.client1 = Groq(api_key=api_key_1)
-        self.client2 = Groq(api_key=api_key_2)
+        # self.client2 = Groq(api_key=api_key_2)
         self.grok_model = grok_model
         self.newsapi = NewsApiClient(api_key=news_api_key)
 
@@ -23,21 +23,26 @@ class IndustryAnalysis:
         sort_by="relevancy",
         page=1,
     ):
-        current_date = datetime.now()
-        formatted_current_date = current_date.strftime("%Y-%m-%d")
-        two_weeks_ago = current_date - timedelta(weeks=1)
-        formatted_two_weeks_ago = two_weeks_ago.strftime("%Y-%m-%d")
-        all_articles = self.newsapi.get_everything(
-            q=f"{industry_sector} {industry_subsector} {region}",
-            from_param=formatted_two_weeks_ago,
-            to=formatted_current_date,
-            language=language,
-            sort_by=sort_by,
-            page=page,
-        )
+        # current_date = datetime.now()
+        # formatted_current_date = current_date.strftime("%Y-%m-%d")
+        # two_weeks_ago = current_date - timedelta(weeks=1)
+        # formatted_two_weeks_ago = two_weeks_ago.strftime("%Y-%m-%d")
+        # all_articles = self.newsapi.get_top_headlines(
+        #     q=f"{industry_sector} {industry_subsector} {region}",
+        #     from_param=formatted_two_weeks_ago,
+        #     to=formatted_current_date,
+        #     language=language,
+        #     sort_by=sort_by,
+        #     page=page,
+        # )
+
+        all_articles = DDGS().news(f"{industry_sector} {industry_subsector} {region} news", max_results=10)
         articles_list = []
-        for article in all_articles["articles"]:
-            articles_list.append({"title": article["title"], "url": article["url"]})
+        for article in all_articles:
+            articles_list.append({"title": article["title"], "url": article["url"], "body": article["body"], "image": article["image"]})
+        for article in articles_list:
+            print(article)
+            print("\n")
         return articles_list
 
     def find_top_competitors(self, industry_sector, industry_subsector, region):
@@ -64,7 +69,7 @@ class IndustryAnalysis:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You provide answers in JSON ${ExampleJSON}",
+                        "content": "You provide answers in JSON {ExampleJSON}",
                     },
                     {
                         "role": "user",
@@ -216,30 +221,37 @@ class IndustryAnalysis:
     #     elif industry_sector == "Artificial Intelligence":
     #         return ai_graph
 
-    def market_size(self, industry_sector, industry_subsector, company_value_proposition):
+    def market_size(
+        self, industry_sector, industry_subsector, company_value_proposition
+    ):
         query = f"{industry_sector} {industry_subsector} market size data yearly"
         results = DDGS().text(query, max_results=30)
         # print(results)
         formattedText = ""
         for result in results:
             formattedText += f'${result["title"]} - ${result["body"]}\n'
-        ExampleJSON = [{'title': "", 'body': ""}, {'title': "", 'body': ""}, {'title': "", 'body': ""}]
+        ExampleJSON = [
+            {"title": "", "body": ""},
+            {"title": "", "body": ""},
+            {"title": "", "body": ""},
+        ]
         year = "2030"
         ResponseFormatJSON = [
-                {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
-                {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
-                ...
-            ]
+            {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
+            {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
+            ...,
+        ]
         chat_completion = self.client2.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": f'Provide the market size data for the industry sector ${industry_sector} and subsector ${industry_subsector} in JSON format. The JSON should contain fields for title, href, and body. An example of the JSON structure is as follows: ${ExampleJSON}./nOutput a list of market sizes for all years up to ${year} for the specified sector and subsector. The response format should strictly adhere to the following JSON format: ${ResponseFormatJSON}\nEnsure the market size unit is consistently stated in billion USD for each response. Try to state market sizes from the year 2012. Only provide market size data as stated. Donot provide any unnecessary data. Give future predictions for the market size if possible. If you donot know the answer, just say that, do not make stuff up.'
-            }
-        ],
-        model= self.grok_model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Provide the market size data for the industry sector ${industry_sector} and subsector ${industry_subsector} in JSON format. The JSON should contain fields for title, href, and body. An example of the JSON structure is as follows: ${ExampleJSON}./nOutput a list of market sizes for all years up to ${year} for the specified sector and subsector. The response format should strictly adhere to the following JSON format: ${ResponseFormatJSON}\nEnsure the market size unit is consistently stated in billion USD for each response. Try to state market sizes from the year 2012. Only provide market size data as stated. Donot provide any unnecessary data. Give future predictions for the market size if possible. If you donot know the answer, just say that, do not make stuff up.",
+                }
+            ],
+            model=self.grok_model,
         )
         return chat_completion.choices[0].message.content
+
 
 if __name__ == "__main__":
     api_key = "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"
@@ -247,23 +259,25 @@ if __name__ == "__main__":
     news_api_key = "2f4a447b4c3942b2bb0504ea778ee9cc"
     analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
 
-    industry_sector = "Technology"
-    industry_subsector = "Artificial Intelligence"
-    company_value_proposition = "Helping creating market research workflow"
-    region = "India"
+    industry_sector = "Healthcare"
+    industry_subsector = "Digital Health"
+    company_value_proposition = "Helping patients with special cases to doctors in india and worldwide"
+    region = "worldwide"
 
-    print(analysis.get_articles(industry_sector, industry_subsector, region))
-    print("-------------------------------------------------")
-    print(analysis.find_top_competitors(industry_sector, industry_subsector, region))
-    print("-------------------------------------------------")
-    print(analysis.find_technological_trends(industry_sector, industry_subsector, region))
-    print("-------------------------------------------------")
-    print(analysis.find_industry_trends(industry_sector, industry_subsector, region))
-    print("-------------------------------------------------")
-    print(
-        analysis.find_key_takeways(
-            industry_sector, industry_subsector, company_value_proposition, region
-        )
-    )
-    print("-------------------------------------------------")
-    print(analysis.top_5_predictions(industry_sector, industry_subsector, region))
+    analysis.get_articles(industry_sector, industry_subsector, region)
+    # print("-------------------------------------------------")
+    # print(analysis.find_top_competitors(industry_sector, industry_subsector, region))
+    # print("-------------------------------------------------")
+    # print(
+    #     analysis.find_technological_trends(industry_sector, industry_subsector, region)
+    # )
+    # print("-------------------------------------------------")
+    # print(analysis.find_industry_trends(industry_sector, industry_subsector, region))
+    # print("-------------------------------------------------")
+    # print(
+    #     analysis.find_key_takeways(
+    #         industry_sector, industry_subsector, company_value_proposition, region
+    #     )
+    # )
+    # print("-------------------------------------------------")
+    # print(analysis.top_5_predictions(industry_sector, industry_subsector, region))
