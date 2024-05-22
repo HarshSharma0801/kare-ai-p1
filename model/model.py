@@ -163,7 +163,7 @@ class IndustryAnalysis:
                     "role": "user",
                     "content": f"""Please analyze the industry sector and subsector for a company with the following value proposition:\nIndustry Sector:
                     {industry_sector}\nIndustry Subsector: {industry_subsector}\nCompany Value Proposition: {company_value_proposition}\n in {region}
-                    Provide key takeaways strictly in {ExampleJSON} json format for the company within its specific sector. Exclude any unnecessary information from the answer.  do not give anything other than the json.
+                    Provide key takeaways strictly in {ExampleJSON} json format for the company within its specific sector. The Key Takeaways should be descriptive, useful, and helpful for the company to improve or grow better. Exclude any unnecessary information from the answer.do not give anything other than the json.
                     If you don\'t know the answer, just say that, do not make stuff up.""",
                 },
             ],
