@@ -8,9 +8,9 @@ import time
 
 
 class IndustryAnalysis:
-    def __init__(self, api_key_1, grok_model, news_api_key):
+    def __init__(self, api_key_1, api_key_2 , grok_model, news_api_key):
         self.client1 = Groq(api_key=api_key_1)
-        # self.client2 = Groq(api_key=api_key_2)
+        self.client2 = Groq(api_key=api_key_2)
         self.grok_model = grok_model
         self.newsapi = NewsApiClient(api_key=news_api_key)
 
@@ -189,17 +189,20 @@ class IndustryAnalysis:
             ...,
         ]
         chat_completion = self.client2.chat.completions.create(
-            messages=[
+        messages=[
                 {
                     "role": "system",
-                    "content": "You provide answers in JSON ${ResponseFormatJSON}",
+                    "content": f'You provide answers in JSON format as specified in {ResponseFormatJSON}.',
                 },
                 {
                     "role": "user",
-                    "content": f"""You have provided the data below for the Top predictions in the industry sector - {industry_sector} and subsector - {industry_subsector} based in {region}\n
-                    {formattedText} in the form of json that contains title, url, body.\nExample of strictly JSON provided -{ExampleJSON} \nYou have to give a list of at least top 5 predictions for the give sector and sub sector.
-                    Also include href for sources with each prediction. The format of response should be in {ResponseFormatJSON} json format in the form of a structured list.  do not give anything other than the json.
-                    If you don\'t know the answer, just say that, do not make stuff up.""",
+                    "content": f"""You have provided data on the top predictions for the industry sector - {industry_sector} and subsector - {industry_subsector} in the region - {region}.\n
+                    {formattedText}\n
+                    The data should be in JSON format containing fields for title, url, and body.\n
+                    Example JSON format: {ExampleJSON}\n
+                    Provide a list of at most the top 5 predictions for the given sector and subsector, including a href link to the sources for each prediction. Ensure the response strictly adheres to the JSON format specified in {ResponseFormatJSON}.\n
+                    Do not include any information other than the JSON response.\n
+                    If you do not know the answer, simply state that you do not know; do not fabricate information.""",
                 },
             ],
             model=self.grok_model,
@@ -215,31 +218,40 @@ class IndustryAnalysis:
     #     elif industry_sector == "Artificial Intelligence":
     #         return ai_graph
 
-    def market_size(
-        self, industry_sector, industry_subsector, company_value_proposition
-    ):
+    def market_size(self, industry_sector, industry_subsector, company_value_proposition):
         query = f"{industry_sector} {industry_subsector} market size data yearly"
         results = DDGS().text(query, max_results=30)
         # print(results)
         formattedText = ""
         for result in results:
             formattedText += f'${result["title"]} - ${result["body"]}\n'
-        ExampleJSON = [
-            {"title": "", "body": ""},
-            {"title": "", "body": ""},
-            {"title": "", "body": ""},
-        ]
+        ExampleJSON = [{'title': "", 'body': ""}, {'title': "", 'body': ""}, {'title': "", 'body': ""}]
         year = "2030"
         ResponseFormatJSON = [
-            {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
-            {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
-            ...,
+            {"source": [
+                {"link": ""},
+                {"link": ""},
+                {"link": ""}
+            ] 
+                
+                },
+            {
+                "chart_data": [
+                {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
+                {"year": "YYYY", "market_size": "X.XX", "unit": "billion USD"},
+                ...
+            ]
+            }
         ]
         chat_completion = self.client2.chat.completions.create(
             messages=[
                 {
+                    "role": "system",
+                    "content": f"You provide answers in JSON format as specified in {ResponseFormatJSON}.",
+                },
+                {
                     "role": "user",
-                    "content": f"Provide the market size data for the industry sector ${industry_sector} and subsector ${industry_subsector} in JSON format. The JSON should contain fields for title, href, and body. An example of the JSON structure is as follows: ${ExampleJSON}./nOutput a list of market sizes for all years up to ${year} for the specified sector and subsector. The response format should strictly adhere to the following JSON format: ${ResponseFormatJSON}\nEnsure the market size unit is consistently stated in billion USD for each response. Try to state market sizes from the year 2012. Only provide market size data as stated. Donot provide any unnecessary data. Give future predictions for the market size if possible. If you donot know the answer, just say that, do not make stuff up.",
+                    "content": f"""Please provide the market size data for the industry sector {industry_sector} and subsector {industry_subsector} in JSON format. The JSON should contain fields for title, href, and body. An example of the JSON structure is as follows: {ExampleJSON}.\nOutput a list of market sizes for all years up to {year} for the specified sector and subsector. Provide only relevant source links and do not exceed 5 sources. The response format should strictly adhere to the following JSON format: {ResponseFormatJSON}.\nEnsure the market size unit is consistently stated in billion USD for each response. Include market sizes starting from the year 2012. Only provide the market size data as stated. Avoid including any unnecessary data. Include future market size predictions if available. If you do not know the answer, simply state that you do not know; do not provide any inaccurate information."""
                 }
             ],
             model=self.grok_model,
@@ -247,8 +259,10 @@ class IndustryAnalysis:
         return chat_completion.choices[0].message.content
 
 
+
 if __name__ == "__main__":
-    api_key = "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"
+    api_key_1 = "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"
+    api_key_2 = "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"
     grok_model = "mixtral-8x7b-32768"
     news_api_key = "2f4a447b4c3942b2bb0504ea778ee9cc"
     analysis = IndustryAnalysis(api_key, grok_model, news_api_key)
